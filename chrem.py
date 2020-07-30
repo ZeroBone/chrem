@@ -7,7 +7,7 @@
 
 from euklidian import gcd, extended_gcd
 
-def chrem_relativelyPrime(congruence1, congruence2):
+def chrem_coprime(congruence1, congruence2):
     (a1, n1) = congruence1
     (a2, n2) = congruence2
 
@@ -28,7 +28,49 @@ def chrem(congruence1, congruence2):
     moduloGcd = gcd(n1, n2)
 
     if moduloGcd == 1:
-        return chrem_relativelyPrime(congruence1, congruence2)
+        return chrem_coprime(congruence1, congruence2)
+
+    n1DividedTimes = 0
+    while n1 % moduloGcd == 0:
+        n1 = n1 // moduloGcd
+        n1DividedTimes = n1DividedTimes + 1
+    
+    n2DividedTimes = 0
+    while n2 % moduloGcd == 0:
+        n2 = n2 // moduloGcd
+        n2DividedTimes = n2DividedTimes + 1
+    
+    if (a1 - a2) % moduloGcd != 0:
+        return None
+    
+    print(n1DividedTimes, n2DividedTimes)
+    print("a = " + str(a1) + " b = " + str(a2))
+
+    additionalCongruence = None
+
+    if n1DividedTimes > n2DividedTimes:
+        additionalCongruence = (a1, moduloGcd ** n1DividedTimes)
+    else:
+        additionalCongruence = (a2, moduloGcd ** n2DividedTimes)
+
+    print((a1 % n1, n1), (a2 % n2, n2))
+    mainSolution = chrem_coprime((a1 % n1, n1), (a2 % n2, n2))
+
+    print(mainSolution, additionalCongruence)
+
+    return chrem(mainSolution, additionalCongruence)
+
+
+
+
+def chrem_old(congruence1, congruence2):
+    (a1, n1) = congruence1
+    (a2, n2) = congruence2
+
+    moduloGcd = gcd(n1, n2)
+
+    if moduloGcd == 1:
+        return chrem_coprime(congruence1, congruence2)
 
     n1 = n1 // moduloGcd
     n2 = n2 // moduloGcd
@@ -39,24 +81,12 @@ def chrem(congruence1, congruence2):
         assert n2 % moduloGcd != 0
         # n2 % moduloGcd != 0 because otherwise the gcd would be incorrect
         # that means the second congruence must be added
-        if moduloGcd % n2 == 0:
-            assert moduloGcd > n2
-            n2 = moduloGcd
-        else:
-            # if x = a2 mod gcd(n1, n2) doesn't already imply x = a2 mod n2/gcd(n1,n2)
-            assert gcd(moduloGcd, n2) == 1
-            additionalCongruence = (a2 % moduloGcd, moduloGcd)
+        additionalCongruence = (a2 % moduloGcd, moduloGcd)
     elif n2 % moduloGcd == 0:
         assert n1 % moduloGcd != 0
         # n1 % moduloGcd != 0 because otherwise the gcd would be incorrect
         # add first congruence
-        if moduloGcd % n1 == 0:
-            assert moduloGcd > n1
-            n1 = moduloGcd
-        else:
-            # if x = a1 mod gcd(n1, n2) doesn't already imply x = a1 mod n1/gcd(n1,n2)
-            assert gcd(moduloGcd, n1) == 1
-            additionalCongruence = (a1 % moduloGcd, moduloGcd)
+        additionalCongruence = (a1 % moduloGcd, moduloGcd)
     else:
         # the new n1 and n2 cannot be further divided by the gcd
         # so we must add the missing terms
@@ -65,32 +95,15 @@ def chrem(congruence1, congruence2):
             # therefore, the congruence system cannot be solved
             return None
         # a1 = a2 mod gcd(n1, n2)
-        # check that the new congruence will not imply some already existing one
-        if moduloGcd % n1 == 0:
-            assert moduloGcd > n1
-            n1 = moduloGcd
-        elif moduloGcd % n2 == 0:
-            assert moduloGcd > n2
-            n2 = moduloGcd
-        else: # if moduloGcd % n1 != 0 and moduloGcd % n2 != 0:
-            # if x = a1 (=a2) mod gcd(n1, n2) doesn't already
-            # imply x = a1 mod n1/gcd(n1,n2) or x = a2 mod n2/gcd(n1,n2)
-            assert gcd(moduloGcd, n1) == 1
-            assert gcd(moduloGcd, n2) == 1
-            additionalCongruence = (a1 % moduloGcd, moduloGcd)
-
-    a1 = a1 % n1
-    a2 = a2 % n2
+        additionalCongruence = (a1 % moduloGcd, moduloGcd)
     
-    print([(a1, n1), (a2, n2), additionalCongruence])
-    
-    # the solution of the two first congruences
-    solution = chrem_relativelyPrime((a1, n1), (a2, n2))
+    print("System:", [(a1 % n1, n1), (a2 % n2, n2), additionalCongruence])
 
-    if additionalCongruence != None:
-        solution = chrem_relativelyPrime(solution, additionalCongruence)
+    mainSolution = chrem_coprime((a1 % n1, n1), (a2 % n2, n2))
 
-    return solution
+    print("Reduced to:", [mainSolution, additionalCongruence])
+
+    return chrem(mainSolution, additionalCongruence)
 
 def chrem_multiple(congruences):
     if len(congruences) == 0:
