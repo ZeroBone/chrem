@@ -5,16 +5,6 @@
     For more information see the LICENCE file.
 """
 
-# Class to represent extended euklidian algorithm result
-class GCD_Result:
-    def __init__(self, gcd, u, v):
-        self.gcd = gcd
-        # u and v are the linear combination coefficients
-        self.u = u
-        self.v = v
-    def __str__(self):
-        return str(self.gcd) + " = " + str(self.u) + " * a + " + str(self.v) + " * b"
-
 def gcd(a, b):
     while True:
         if b == 0:
@@ -39,11 +29,15 @@ def extended_gcd(a, b):
 """
 
 def extended_gcd(a, b):
+
+    assert a >= 1
+    assert b >= 1
+
     if a == 0:
-        return GCD_Result(b, 0, 1)
+        return (b, 0, 1)
 
     if b == 0:
-        return GCD_Result(a, 1, 0)
+        return (a, 1, 0)
 
     unPrev = 1
     vnPrev = 0
@@ -57,7 +51,7 @@ def extended_gcd(a, b):
         b = newB
 
         if b == 0:
-            return GCD_Result(a, unCur, vnCur)
+            return (a, unCur, vnCur)
 
         # Update coefficients
         unNew = unPrev - bn * unCur

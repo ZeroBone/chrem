@@ -7,59 +7,32 @@
 
 from euklidian import gcd, extended_gcd
 
-def chrem_coprime(congruence1, congruence2):
-    (a1, n1) = congruence1
-    (a2, n2) = congruence2
-
-    moduloGcd = extended_gcd(n2, n1)
-
-    assert moduloGcd.gcd == 1
-
-    solution = n2 * a1 * moduloGcd.u + n1 * a2 * moduloGcd.v
-
-    modulo = n1 * n2
-
-    return (solution % modulo, modulo)
-
 def chrem(congruence1, congruence2):
     (a1, n1) = congruence1
     (a2, n2) = congruence2
 
-    moduloGcd = gcd(n1, n2)
+    (moduloGcd, u, v) = extended_gcd(n1, n2)
 
     if moduloGcd == 1:
-        return chrem_coprime(congruence1, congruence2)
+
+        solution = n1 * a2 * u + n2 * a1 * v
+
+        modulo = n1 * n2
+
+        return (solution % modulo, modulo)
 
     if (a1 - a2) % moduloGcd != 0:
+        # Unsolvable
         return None
 
-    moduloFactorN1 = 1
+    moduloLcm = (n1 // moduloGcd) * n2
 
-    while n1 % moduloGcd == 0:
-        n1 = n1 // moduloGcd
-        moduloFactorN1 = moduloFactorN1 * moduloGcd
+    k = (a1 - a2) // moduloGcd
+
+    solution = a1 - n1 * u * k
+
+    return (solution % moduloLcm, moduloLcm)
     
-    moduloFactorN2 = 1
-
-    while n2 % moduloGcd == 0:
-        n2 = n2 // moduloGcd
-        moduloFactorN2 = moduloFactorN2 * moduloGcd
-
-    additionalCongruence = None
-
-    if moduloFactorN1 > moduloFactorN2:
-        assert moduloFactorN1 % moduloFactorN2 == 0
-        additionalCongruence = (a1 % moduloFactorN1, moduloFactorN1)
-    else:
-        assert moduloFactorN2 % moduloFactorN1 == 0
-        additionalCongruence = (a2 % moduloFactorN2, moduloFactorN2)
-
-    mainSolution = chrem_coprime((a1 % n1, n1), (a2 % n2, n2))
-    print("1) Solving:", (a1 % n1, n1), (a2 % n2, n2), "=>", mainSolution)
-
-    print("2) Solving:", mainSolution, additionalCongruence)
-
-    return chrem(mainSolution, additionalCongruence)
 
 def chrem_multiple(congruences):
     if len(congruences) == 0:
