@@ -30,78 +30,34 @@ def chrem(congruence1, congruence2):
     if moduloGcd == 1:
         return chrem_coprime(congruence1, congruence2)
 
-    n1DividedTimes = 0
-    while n1 % moduloGcd == 0:
-        n1 = n1 // moduloGcd
-        n1DividedTimes = n1DividedTimes + 1
-    
-    n2DividedTimes = 0
-    while n2 % moduloGcd == 0:
-        n2 = n2 // moduloGcd
-        n2DividedTimes = n2DividedTimes + 1
-    
     if (a1 - a2) % moduloGcd != 0:
         return None
+
+    moduloFactorN1 = 1
+
+    while n1 % moduloGcd == 0:
+        n1 = n1 // moduloGcd
+        moduloFactorN1 = moduloFactorN1 * moduloGcd
     
-    print(n1DividedTimes, n2DividedTimes)
-    print("a = " + str(a1) + " b = " + str(a2))
+    moduloFactorN2 = 1
+
+    while n2 % moduloGcd == 0:
+        n2 = n2 // moduloGcd
+        moduloFactorN2 = moduloFactorN2 * moduloGcd
 
     additionalCongruence = None
 
-    if n1DividedTimes > n2DividedTimes:
-        additionalCongruence = (a1, moduloGcd ** n1DividedTimes)
+    if moduloFactorN1 > moduloFactorN2:
+        assert moduloFactorN1 % moduloFactorN2 == 0
+        additionalCongruence = (a1 % moduloFactorN1, moduloFactorN1)
     else:
-        additionalCongruence = (a2, moduloGcd ** n2DividedTimes)
-
-    print((a1 % n1, n1), (a2 % n2, n2))
-    mainSolution = chrem_coprime((a1 % n1, n1), (a2 % n2, n2))
-
-    print(mainSolution, additionalCongruence)
-
-    return chrem(mainSolution, additionalCongruence)
-
-
-
-
-def chrem_old(congruence1, congruence2):
-    (a1, n1) = congruence1
-    (a2, n2) = congruence2
-
-    moduloGcd = gcd(n1, n2)
-
-    if moduloGcd == 1:
-        return chrem_coprime(congruence1, congruence2)
-
-    n1 = n1 // moduloGcd
-    n2 = n2 // moduloGcd
-
-    additionalCongruence = None
-    
-    if n1 % moduloGcd == 0:
-        assert n2 % moduloGcd != 0
-        # n2 % moduloGcd != 0 because otherwise the gcd would be incorrect
-        # that means the second congruence must be added
-        additionalCongruence = (a2 % moduloGcd, moduloGcd)
-    elif n2 % moduloGcd == 0:
-        assert n1 % moduloGcd != 0
-        # n1 % moduloGcd != 0 because otherwise the gcd would be incorrect
-        # add first congruence
-        additionalCongruence = (a1 % moduloGcd, moduloGcd)
-    else:
-        # the new n1 and n2 cannot be further divided by the gcd
-        # so we must add the missing terms
-        if a1 % moduloGcd != a2 % moduloGcd:
-            # the two additional and mandatory congruences are not equivalent
-            # therefore, the congruence system cannot be solved
-            return None
-        # a1 = a2 mod gcd(n1, n2)
-        additionalCongruence = (a1 % moduloGcd, moduloGcd)
-    
-    print("System:", [(a1 % n1, n1), (a2 % n2, n2), additionalCongruence])
+        assert moduloFactorN2 % moduloFactorN1 == 0
+        additionalCongruence = (a2 % moduloFactorN2, moduloFactorN2)
 
     mainSolution = chrem_coprime((a1 % n1, n1), (a2 % n2, n2))
+    print("1) Solving:", (a1 % n1, n1), (a2 % n2, n2), "=>", mainSolution)
 
-    print("Reduced to:", [mainSolution, additionalCongruence])
+    print("2) Solving:", mainSolution, additionalCongruence)
 
     return chrem(mainSolution, additionalCongruence)
 
@@ -134,6 +90,6 @@ if __name__ == "__main__":
 
     print("")
     if (solution == None):
-        print("> This congruence system is unsolvable.")
+        print("> L = {}")
     else:
         print("> L = " + str(solution[0]) + " + " + str(solution[1]) + "Z")
