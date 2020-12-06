@@ -14,25 +14,8 @@ def gcd(a, b):
             return b
         b = b % a
 
-"""
-def extended_gcd(a, b):
-    if a == 0:
-        return GCD_Result(b, 0, 1)
-
-    result = extended_gcd(b % a, a)
-
-    u = result.u
-    result.u = result.v - (b // a) * result.u
-    result.v = u
-
-    return result
-"""
 
 def extended_gcd(a, b):
-
-    assert a >= 1
-    assert b >= 1
-
     if a == 0:
         return (b, 0, 1)
 
@@ -45,17 +28,17 @@ def extended_gcd(a, b):
     vnCur = 1
 
     while True:
-        bn = a // b
-        newB = a % b
+        qn = a // b
+        newR = a % b
         a = b
-        b = newB
+        b = newR
 
         if b == 0:
             return (a, unCur, vnCur)
 
         # Update coefficients
-        unNew = unPrev - bn * unCur
-        vnNew = vnPrev - bn * vnCur
+        unNew = unPrev - qn * unCur
+        vnNew = vnPrev - qn * vnCur
 
         # Shift coefficients
         unPrev = unCur

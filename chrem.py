@@ -41,8 +41,16 @@ def chrem_multiple(congruences):
         return congruences[0]
     # 2 or more congruences
     solution = chrem(congruences[0], congruences[1])
+
+    if solution == None:
+        return None
+
     for congruence in congruences[2::]:
         solution = chrem(solution, congruence)
+
+        if solution == None:
+            return None
+
     return solution
 
 if __name__ == "__main__":
